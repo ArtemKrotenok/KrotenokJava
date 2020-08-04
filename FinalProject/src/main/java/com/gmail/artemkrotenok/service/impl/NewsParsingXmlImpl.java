@@ -1,5 +1,6 @@
 package com.gmail.artemkrotenok.service.impl;
 
+import com.gmail.artemkrotenok.service.NewsParsing;
 import com.gmail.artemkrotenok.service.model.SummaryNews;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,8 +11,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
 import java.lang.invoke.MethodHandles;
 
-public class NewsXmlUrlServiceImpl extends NewsUrlServiceImpl {
-
+public class NewsParsingXmlImpl implements NewsParsing {
     private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override

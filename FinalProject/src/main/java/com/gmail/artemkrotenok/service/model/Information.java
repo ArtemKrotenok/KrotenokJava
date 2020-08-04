@@ -5,9 +5,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-
 public class Information implements Serializable {
-
     private Integer id;
     private String title;
     private String description;
@@ -15,7 +13,6 @@ public class Information implements Serializable {
     @XmlElementWrapper(name = "keywords")
     @XmlElement(name = "element")
     private List<String> keywords;
-
     private boolean visible;
 
     public Integer getId() {
@@ -65,5 +62,4 @@ public class Information implements Serializable {
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
-
 }

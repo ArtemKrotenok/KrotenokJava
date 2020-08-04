@@ -1,33 +1,37 @@
 package com.gmail.artemkrotenok;
 
+import com.gmail.artemkrotenok.service.NewsParsing;
 import com.gmail.artemkrotenok.service.NewsService;
-import com.gmail.artemkrotenok.service.impl.NewsJsonUrlServiceImpl;
-import com.gmail.artemkrotenok.service.impl.NewsXmlUrlServiceImpl;
-import com.gmail.artemkrotenok.service.model.SummaryNews;
+import com.gmail.artemkrotenok.service.impl.NewsDownloadFromUrl;
+import com.gmail.artemkrotenok.service.impl.NewsParsingJsonImpl;
+import com.gmail.artemkrotenok.service.impl.NewsParsingXmlImpl;
+import com.gmail.artemkrotenok.service.impl.NewsServiceImpl;
 
 import java.util.List;
 import java.util.Scanner;
 
 public class App {
-
     public static void main(String[] args) {
-        NewsService newsService = initService();
-        SummaryNews summaryNews = getSummaryNews(newsService);
-        processInformation(summaryNews, newsService);
+        NewsParsing newsParsing = initParsingService();
+
+        String addressSource = getAddressSource();
+
+        processInformation(addressSource, newsParsing);
+
     }
 
-    private static void processInformation(SummaryNews summaryNews, NewsService newsService) {
+    private static void processInformation(String addressSource, NewsParsing newsParsing) {
         List<String> finedInformation;
         int choseUser;
         do {
             choseUser = choseUser();
             switch (choseUser) {
                 case 1: {
-                    printAllNews(summaryNews, newsService);
+                    printAllNews(addressSource, newsParsing);
                     break;
                 }
                 case 2: {
-                    searchByTag(summaryNews, newsService);
+                    searchByTag(addressSource, newsParsing);
                     break;
                 }
                 default:
@@ -36,31 +40,23 @@ public class App {
         } while (choseUser != 3);
     }
 
-    private static SummaryNews getSummaryNews(NewsService newsService) {
-        SummaryNews summaryNews = null;
-        do {
-            Scanner input = new Scanner(System.in);
-            input.reset();
-            System.out.println("Input URL address:");
-            String addressSource = input.nextLine();
-            summaryNews = newsService.getNewsFromSource(addressSource);
-            if (summaryNews == null) {
-                System.out.println("Cannot download data, check address !");
-            }
-        } while (summaryNews == null);
-        return summaryNews;
+    private static String getAddressSource() {
+        Scanner input = new Scanner(System.in);
+        input.reset();
+        System.out.println("Input URL address:");
+        return input.nextLine();
     }
 
-    private static NewsService initService() {
-        NewsService newsService = null;
+    private static NewsParsing initParsingService() {
+        NewsParsing newsParsing = null;
         do {
             switch (choseUserXmlOrJson()) {
                 case 1: {
-                    newsService = new NewsJsonUrlServiceImpl();
+                    newsParsing = new NewsParsingJsonImpl();
                     break;
                 }
                 case 2: {
-                    newsService = new NewsXmlUrlServiceImpl();
+                    newsParsing = new NewsParsingXmlImpl();
                     break;
                 }
                 case 3: {
@@ -69,22 +65,24 @@ public class App {
                 default:
                     System.out.println("Not correct input (need '1' or '2')");
             }
-        } while (newsService == null);
-        return newsService;
+        } while (newsParsing == null);
+        return newsParsing;
     }
 
-    private static void printAllNews(SummaryNews summaryNews, NewsService newsService) {
-        List<String> finedInformation = newsService.getAllInformationSortByDate(summaryNews);
+    private static void printAllNews(String addressSource, NewsParsing newsParsing) {
+        NewsService newsService = new NewsServiceImpl(new NewsDownloadFromUrl(), newsParsing, addressSource);
+        List<String> finedInformation = newsService.getAllInformationSortByDate();
         for (String information : finedInformation) {
             System.out.println(information);
         }
     }
 
-    private static void searchByTag(SummaryNews summaryNews, NewsService newsService) {
+    private static void searchByTag(String addressSource, NewsParsing newsParsing) {
         System.out.println("Input tag for news:");
         Scanner input = new Scanner(System.in);
         String tagNews = input.nextLine();
-        List<String> finedInformation = newsService.findInformationByKeyword(summaryNews, tagNews);
+        NewsService newsService = new NewsServiceImpl(new NewsDownloadFromUrl(), newsParsing, addressSource);
+        List<String> finedInformation = newsService.findInformationByKeyword(tagNews);
         if (finedInformation == null || finedInformation.isEmpty()) {
             System.out.println("News with tag '" + tagNews + "' not found");
         } else {

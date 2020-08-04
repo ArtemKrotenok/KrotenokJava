@@ -1,23 +1,44 @@
 package com.gmail.artemkrotenok.service.impl;
 
+import com.gmail.artemkrotenok.service.NewsGet;
+import com.gmail.artemkrotenok.service.NewsParsing;
 import com.gmail.artemkrotenok.service.NewsService;
 import com.gmail.artemkrotenok.service.model.Information;
 import com.gmail.artemkrotenok.service.model.SummaryNews;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-public abstract class NewsServiceImpl implements NewsService {
+public class NewsServiceImpl implements NewsService {
     private static final String PARSING_PATTERN_DATE_TAME = "yyyy-MM-dd HH:mm:ss Z";
     private static final String PRINT_FORMAT_PATTERN_DATE_TAME = "HH:mm:ss dd LLLL yyyy";
+    private final NewsGet newsGet;
+    private final NewsParsing newsParsing;
+    private final String addressSource;
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+
+    public NewsServiceImpl(NewsGet newsGet, NewsParsing newsParsing, String addressSource) {
+        this.newsGet = newsGet;
+        this.newsParsing = newsParsing;
+        this.addressSource = addressSource;
+    }
 
     @Override
-    public abstract SummaryNews getNewsFromSource(String sourceAddress);
-
-    @Override
-    public List<String> getAllInformationSortByDate(SummaryNews news) {
-        List<Information> outInformationList = news.getNews();
+    public List<String> getAllInformationSortByDate() {
+        String downloadData = newsGet.getNewsFromSource(addressSource);
+        if (downloadData == null) {
+            logger.error("Cannot download data, check address !");
+            return Collections.emptyList();
+        }
+        SummaryNews summaryNews = newsParsing.getSummaryNewsFromText(downloadData);
+        List<Information> outInformationList = summaryNews.getNews();
         outInformationList = sortByDate(outInformationList);
         List<String> resultList = new ArrayList<>();
         for (Information information : outInformationList) {
@@ -36,7 +57,13 @@ public abstract class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    public List<String> findInformationByKeyword(SummaryNews summaryNews, String keyword) {
+    public List<String> findInformationByKeyword(String keyword) {
+        String downloadData = newsGet.getNewsFromSource(addressSource);
+        if (downloadData == null) {
+            logger.error("Cannot download data, check address !");
+            return Collections.emptyList();
+        }
+        SummaryNews summaryNews = newsParsing.getSummaryNewsFromText(downloadData);
         List<String> finedInformationList = new ArrayList<>();
         List<Information> news = summaryNews.getNews();
         for (Information information : news) {

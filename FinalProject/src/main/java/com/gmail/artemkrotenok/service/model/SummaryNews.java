@@ -6,9 +6,7 @@ import java.util.List;
 
 @XmlRootElement(name = "root")
 @XmlAccessorType(XmlAccessType.FIELD)
-
 public class SummaryNews implements Serializable {
-
     private String name;
     private String location;
     @XmlElementWrapper(name = "news")

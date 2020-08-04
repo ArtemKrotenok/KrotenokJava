@@ -1,14 +1,9 @@
 package com.gmail.artemkrotenok.service;
 
-import com.gmail.artemkrotenok.service.model.SummaryNews;
-
 import java.util.List;
 
 public interface NewsService {
+    List<String> getAllInformationSortByDate();
 
-    SummaryNews getNewsFromSource(String sourceAddress);
-
-    List<String> getAllInformationSortByDate(SummaryNews news);
-
-    List<String> findInformationByKeyword(SummaryNews summaryNews, String keyword);
+    List<String> findInformationByKeyword(String keyword);
 }
