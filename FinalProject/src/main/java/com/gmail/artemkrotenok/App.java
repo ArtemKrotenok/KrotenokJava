@@ -13,11 +13,8 @@ import java.util.Scanner;
 public class App {
     public static void main(String[] args) {
         NewsParsing newsParsing = initParsingService();
-
         String addressSource = getAddressSource();
-
         processInformation(addressSource, newsParsing);
-
     }
 
     private static void processInformation(String addressSource, NewsParsing newsParsing) {
