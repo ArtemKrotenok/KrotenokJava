@@ -7,3 +7,6 @@ out/
 
 # maven
 target/
+
+# app
+logs
